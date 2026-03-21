@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { login } from "../api/authApi";
 
-function LoginSection() {
+function LoginSection({ onLoginSuccess }) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -9,29 +10,21 @@ function LoginSection() {
         try {
             setMessage("로그인 요청 중...");
 
-            const response = await fetch("http://localhost:8080/auth/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            });
+            const data = await login(email, password);
 
-            const data = await response.json();
-            console.log("응답:", data);
+            localStorage.setItem("accessToken", data.accessToken);
+            setMessage("로그인 성공!");
 
-            if (response.ok) {
-                localStorage.setItem("accessToken", data.accessToken);
-                setMessage("로그인 성공!");
-            } else {
-                setMessage(`로그인 실패: ${data.message || "에러 발생"}`);
+            if (onLoginSuccess) {
+                onLoginSuccess();
             }
         } catch (error) {
             console.error("에러:", error);
-            setMessage(`에러 발생: ${error.message}`);
+
+            const message =
+                error.response?.data?.message || "로그인 실패 또는 서버 오류";
+
+            setMessage(`에러 발생: ${message}`);
         }
     };
 

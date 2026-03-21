@@ -1,46 +1,36 @@
 import { useState } from "react";
+import { createBoard } from "../api/boardApi";
 
 function BoardCreateSection({ onBoardCreated }) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [message, setMessage] = useState("");
 
-    const createBoard = async () => {
+    const handleCreateBoard = async () => {
         const token = localStorage.getItem("accessToken");
 
         if (!token) {
-            setMessage("먼저 로그인 해주세요.");
+            setMessage("로그인이 필요합니다.");
             return;
         }
 
         try {
-            const response = await fetch("http://localhost:8080/boards", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name,
-                    description
-                })
-            });
+            await createBoard(name, description, token);
 
-            const data = await response.json();
-            console.log("게시글 생성 응답:", data);
+            setMessage("게시글 생성 성공!");
+            setName("");
+            setDescription("");
 
-            if (response.ok) {
-                setMessage("게시글 생성 성공!");
-                setName("");
-                setDescription("");
-
+            if (onBoardCreated) {
                 onBoardCreated();
-            } else {
-                setMessage(`게시글 생성 실패: ${data.message || "에러 발생"}`);
             }
         } catch (error) {
-            console.error("게시글 생성 에러:", error);
-            setMessage(`에러 발생: ${error.message}`);
+            console.error("게시글 생성 실패:", error);
+
+            const message =
+                error.response?.data?.message || "게시글 생성 실패";
+
+            setMessage(message);
         }
     };
 
@@ -66,7 +56,8 @@ function BoardCreateSection({ onBoardCreated }) {
             <br />
             <br />
 
-            <button onClick={createBoard}>게시글 생성</button>
+            <button onClick={handleCreateBoard}>게시글 생성</button>
+
             <p>{message}</p>
         </div>
     );

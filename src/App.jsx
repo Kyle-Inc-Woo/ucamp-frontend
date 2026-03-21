@@ -1,21 +1,76 @@
-import { useState} from "react";
-
-import LoginSection from "./pages/LoginSection";
-import BoardCreateSection from "./pages/BoardCreateSection";
-import BoardList from "./pages/BoardList";
+import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage.jsx";
+import BoardPage from "./pages/BoardPage.jsx";
+import BoardDetailPage from "./pages/BoardDetailPage.jsx";
 
 function App() {
-    const [refreshCount, setRefreshCount] = useState(0);
+    const [isLoggedIn, setIsLoggedIn] = useState(
+        !!localStorage.getItem("accessToken")
+    );
 
-    const handleBoardCreated = () => {
-        setRefreshCount((prev) => prev + 1);
-    }
+    const handleLoginSuccess = () => {
+        setIsLoggedIn(true);
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem("accessToken");
+        setIsLoggedIn(false);
+    };
+
     return (
-        <div style={{ padding: "20px" }}>
-            <LoginSection />
-            <BoardCreateSection onBoardCreated={handleBoardCreated}/>
-            <BoardList refreshCount={refreshCount}/>
-        </div>
+        <BrowserRouter>
+            <div style={{ padding: "20px" }}>
+                <h1>UCAMP</h1>
+                <h3>현재 상태: {isLoggedIn ? "로그인됨" : "로그인 안 됨"}</h3>
+
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            isLoggedIn ? (
+                                <Navigate to="/boards" replace />
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/login"
+                        element={
+                            isLoggedIn ? (
+                                <Navigate to="/boards" replace />
+                            ) : (
+                                <LoginPage onLoginSuccess={handleLoginSuccess} />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/boards"
+                        element={
+                            isLoggedIn ? (
+                                <BoardPage onLogout={handleLogout} />
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/boards/:id"
+                        element={
+                            isLoggedIn ? (
+                                <BoardDetailPage/>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+                </Routes>
+            </div>
+        </BrowserRouter>
     );
 }
 
