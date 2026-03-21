@@ -1,16 +1,52 @@
-# React + Vite
+# UCAMP Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+UCAMP Frontend is a React-based client application for the UCAMP project.  
+It connects with the Spring Boot backend (`ucamp-api`) and provides authentication, board CRUD, and routing features.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- User login with JWT authentication
+- Logout
+- Board list page
+- Board detail page
+- Create board
+- Update board
+- Delete board
+- Protected routes with React Router
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- React
+- Vite
+- React Router DOM
+- JavaScript
+- LocalStorage (JWT storage)
+
+---
+
+## Pages
+
+- `/login` : login page
+- `/boards` : board list + board create
+- `/boards/:id` : board detail page
+
+---
+
+## Project Structure
+
+```bash
+src/
+├─ components/
+│  ├─ LoginSection.jsx
+│  ├─ BoardCreateSection.jsx
+│  └─ BoardList.jsx
+├─ pages/
+│  ├─ LoginPage.jsx
+│  ├─ BoardPage.jsx
+│  └─ BoardDetailPage.jsx
+├─ App.jsx
+└─ main.jsx
