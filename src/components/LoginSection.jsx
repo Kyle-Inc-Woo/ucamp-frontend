@@ -13,6 +13,7 @@ function LoginSection({ onLoginSuccess }) {
             const data = await login(email, password);
 
             localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refreshToken", data.refreshToken);
             setMessage("로그인 성공!");
 
             if (onLoginSuccess) {

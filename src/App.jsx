@@ -2,7 +2,9 @@ import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage.jsx";
 import BoardPage from "./pages/BoardPage.jsx";
+import BoardCreatePage from "./pages/BoardCreatePage.jsx";
 import BoardDetailPage from "./pages/BoardDetailPage.jsx";
+import BoardEditPage from "./pages/BoardEditPage.jsx";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(
@@ -15,6 +17,7 @@ function App() {
 
     const handleLogout = () => {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         setIsLoggedIn(false);
     };
 
@@ -59,10 +62,32 @@ function App() {
                     />
 
                     <Route
+                        path="/boards/new"
+                        element={
+                            isLoggedIn ? (
+                                <BoardCreatePage/>
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
                         path="/boards/:id"
                         element={
                             isLoggedIn ? (
-                                <BoardDetailPage/>
+                                <BoardDetailPage />
+                            ) : (
+                                <Navigate to="/login" replace />
+                            )
+                        }
+                    />
+
+                    <Route
+                        path="/boards/:id/edit"
+                        element={
+                            isLoggedIn ? (
+                                <BoardEditPage/>
                             ) : (
                                 <Navigate to="/login" replace />
                             )

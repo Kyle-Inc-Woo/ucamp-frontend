@@ -10,40 +10,25 @@ export const getBoardById = async (id) => {
     return response.data;
 };
 
-export const createBoard = async (name, description, token) => {
-    const response = await axiosInstance.post(
-        "/boards",
-        { name, description },
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
-
-    return response.data;
-};
-
-export const updateBoard = async (id, name, description, token) => {
-    const response = await axiosInstance.put(
-        `/boards/${id}`,
-        { name, description },
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        }
-    );
-
-    return response.data;
-};
-
-export const deleteBoard = async (id, token) => {
-    const response = await axiosInstance.delete(`/boards/${id}`, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+export const createBoard = async (name, description) => {
+    const response = await axiosInstance.post("/boards", {
+        name,
+        description,
     });
 
+    return response.data;
+};
+
+export const updateBoard = async (id, name, description) => {
+    const response = await axiosInstance.put(`/boards/${id}`, {
+        name,
+        description,
+    });
+
+    return response.data;
+};
+
+export const deleteBoard = async (id) => {
+    const response = await axiosInstance.delete(`/boards/${id}`);
     return response.data;
 };

@@ -1,31 +1,28 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BoardCreateSection from "../components/BoardCreateSection";
 import BoardList from "../components/BoardList";
 
 function BoardPage({ onLogout }) {
-    const [refreshCount, setRefreshCount] = useState(0);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
     const navigate = useNavigate();
 
     const handleBoardCreated = () => {
-        setRefreshCount((prev) => prev + 1);
-    };
-
-    const handleLogout = () => {
-        if (onLogout) {
-            onLogout();
-        }
-        navigate("/login");
+        setRefreshTrigger((prev) => !prev);
     };
 
     return (
         <div>
-            <button onClick={handleLogout} style={{ marginBottom: "20px" }}>
-                로그아웃
-            </button>
+            <div style = {{ marginBottom : "20px"}}>
+                <button onClick={onLogout} style={{ marginBottom: "20px" }}>
+                    로그아웃
+                </button>
 
-            <BoardCreateSection onBoardCreated={handleBoardCreated} />
-            <BoardList refreshCount={refreshCount} />
+                <button onClick={()=> navigate("/boards/new")}>
+                    글쓰기
+                </button>
+            </div>
+
+            <BoardList refreshTrigger={refreshTrigger} onBoardcreated={handleBoardCreated}/>
         </div>
     );
 }

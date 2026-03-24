@@ -7,15 +7,13 @@ function BoardCreateSection({ onBoardCreated }) {
     const [message, setMessage] = useState("");
 
     const handleCreateBoard = async () => {
-        const token = localStorage.getItem("accessToken");
-
-        if (!token) {
-            setMessage("로그인이 필요합니다.");
-            return;
-        }
+       if (!name.trim() || !description.trim()) {
+           setMessage("제목과 내용을 입력해주세요. ");
+           return;
+       }
 
         try {
-            await createBoard(name, description, token);
+            await createBoard(name, description,);
 
             setMessage("게시글 생성 성공!");
             setName("");
