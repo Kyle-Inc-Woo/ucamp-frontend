@@ -2,60 +2,58 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBoards } from "../api/boardApi";
 
-function BoardList({ refreshCount }) {
+function BoardList() {
     const [boards, setBoards] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
     const navigate = useNavigate();
 
-    const fetchBoards = async () => {
-        try {
-            setLoading(true);
-            setError("");
-
-            const data = await getBoards();
-            setBoards(data);
-        } catch (error) {
-            console.error("게시글 목록 불러오기 실패:", error);
-            setError(error.response?.data?.message || "게시글 목록 조회 실패");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchBoards = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                const data = await getBoards();
+                setBoards(data);
+            } catch (error) {
+                console.error("게시판 목록 불러오기 실패:", error);
+                setError(error.response?.data?.message || "게시판 목록 조회 실패");
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchBoards();
-    }, [refreshCount]);
+    }, []);
 
     if (loading) {
-        return <p>게시글 목록 불러오는 중...</p>;
+        return <p className="text-sm text-gray-500">게시판 목록 불러오는 중...</p>;
     }
 
     if (error) {
-        return <p>에러: {error}</p>;
+        return <p className="text-sm text-red-600">에러: {error}</p>;
     }
 
     return (
-        <div style={{ marginTop: "30px" }}>
-            <h2>게시글 목록</h2>
-
+        <div className="space-y-4">
             {boards.length === 0 ? (
-                <p>게시글이 없습니다.</p>
+                <div className="rounded-3xl bg-white px-6 py-10 text-center text-gray-500 shadow-sm">
+                    게시판이 없습니다.
+                </div>
             ) : (
                 boards.map((board) => (
                     <div
                         key={board.id}
                         onClick={() => navigate(`/boards/${board.id}`)}
-                        style={{
-                            border: "1px solid #ccc",
-                            padding: "10px",
-                            marginBottom: "10px",
-                            cursor: "pointer",
-                        }}
+                        className="cursor-pointer rounded-3xl bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     >
-                        <h3>{board.name}</h3>
-                        <p>{board.description}</p>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                            {board.name}
+                        </h3>
+                        <p className="mt-2 text-sm text-gray-500">
+                            {board.description}
+                        </p>
                     </div>
                 ))
             )}

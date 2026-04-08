@@ -1,93 +1,151 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { deleteBoard, getBoardById } from "../api/boardApi";
+import { getBoardById } from "../api/boardApi";
+import { getPostsByBoardId } from "../api/postApi";
+import Header from "../components/Header";
 
-function BoardDetailPage() {
+function BoardDetailPage({ onLogout }) {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [board, setBoard] = useState(null);
+    const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const isLoggedIn = !!localStorage.getItem("accessToken");
+
+    const handleLogin = () => {
+        navigate("/login");
+    };
+
     useEffect(() => {
-        const fetchBoard = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
                 setError("");
 
-                const data = await getBoardById(id);
-                setBoard(data);
+                const boardData = await getBoardById(id);
+                const postData = await getPostsByBoardId(id);
+
+                setBoard(boardData);
+                setPosts(postData);
             } catch (err) {
-                console.error("게시글 상세 조회 실패:", err);
-                setError(err.response?.data?.message || "게시글 조회 실패");
+                console.error("게시판 조회 실패:", err);
+                setError(err.response?.data?.message || "게시판을 불러오지 못했습니다.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchBoard();
+        fetchData();
     }, [id]);
 
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 px-5 py-10">
+                <div className="mx-auto max-w-5xl">
+                    <Header
+                        isLoggedIn={isLoggedIn}
+                        onLogout={onLogout}
+                        onLogin={handleLogin}
+                    />
+                    <p className="text-sm text-gray-500">불러오는 중...</p>
+                </div>
+            </div>
+        );
+    }
 
-    const handleDelete = async () => {
-        const confirmed = window.confirm("정말 이 게시글을 삭제할까요?");
-        if (!confirmed) {
-            return;
-        }
+    if (error) {
+        return (
+            <div className="min-h-screen bg-gray-50 px-5 py-10">
+                <div className="mx-auto max-w-5xl">
+                    <Header
+                        isLoggedIn={isLoggedIn}
+                        onLogout={onLogout}
+                        onLogin={handleLogin}
+                    />
+                    <p className="text-sm text-red-600">에러: {error}</p>
+                </div>
+            </div>
+        );
+    }
 
-        try {
-            await deleteBoard(id);
-            alert("게시글이 삭제되었습니다.");
-            navigate("/boards");
-        } catch (err) {
-            console.error("게시글 삭제 실패:", err);
-            alert(err.response?.data?.message || "게시글 삭제 실패");
-        }
-    };
-
-    if (loading) return <p>불러오는 중...</p>;
-    if (error) return <p>에러: {error}</p>;
-    if (!board) return <p>게시글이 없습니다.</p>;
+    if (!board) {
+        return (
+            <div className="min-h-screen bg-gray-50 px-5 py-10">
+                <div className="mx-auto max-w-5xl">
+                    <Header
+                        isLoggedIn={isLoggedIn}
+                        onLogout={onLogout}
+                        onLogin={handleLogin}
+                    />
+                    <p className="text-sm text-gray-500">게시판이 없습니다.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div style={{ marginTop: "30px" }}>
-            <button
-                onClick={() => navigate("/boards")}
-                style={{ marginBottom: "20px" }}
-            >
-                목록으로
-            </button>
+        <div className="min-h-screen bg-gray-50 px-5 py-10">
+            <div className="mx-auto max-w-5xl">
+                <Header
+                    isLoggedIn={isLoggedIn}
+                    onLogout={onLogout}
+                    onLogin={handleLogin}
+                />
 
-            <button onClick={()=> navigate(`/boards/${id}/edit`)}
-                    style= {{marginRight : "10px"}}
-            >
-                수정하러 가기
-            </button>
+                <div className="mb-6">
+                    <button
+                        onClick={() => navigate("/boards")}
+                        className="mb-5 rounded-xl bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:bg-gray-300"
+                    >
+                        목록으로
+                    </button>
 
-            <button onClick={handleDelete}>삭제</button>
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">
+                                {board.name}
+                            </h1>
+                            <p className="mt-2 text-sm text-gray-500">
+                                {board.description}
+                            </p>
+                        </div>
 
-            <h2>게시글 상세</h2>
+                        {isLoggedIn && (
+                            <button
+                                onClick={() => navigate(`/posts/create?boardId=${board.id}`)}
+                                className="rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                            >
+                                글쓰기
+                            </button>
+                        )}
+                    </div>
+                </div>
 
-            <div
-                style={{
-                    border: "1px solid #ccc",
-                    padding: "15px",
-                    marginTop: "10px",
-                }}
-            >
-                <p>
-                    <strong>ID:</strong> {board.id}
-                </p>
-                <p>
-                    <strong>제목:</strong> {board.name}
-                </p>
-                <p>
-                    <strong>내용:</strong> {board.description}
-                </p>
-                <p>
-                    <strong>작성일:</strong> {board.createdAt}
-                </p>
+                <div className="space-y-4">
+                    {posts.length === 0 ? (
+                        <div className="rounded-3xl bg-white px-6 py-10 text-center text-gray-500 shadow-sm">
+                            아직 게시글이 없습니다.
+                        </div>
+                    ) : (
+                        posts.map((post) => (
+                            <div
+                                key={post.id}
+                                onClick={() => navigate(`/posts/${post.id}`)}
+                                className="cursor-pointer rounded-3xl bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                            >
+                                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                                    {post.title}
+                                </h3>
+                                <p className="line-clamp-3 text-sm leading-6 text-gray-600">
+                                    {post.content}
+                                </p>
+                            </div>
+                        ))
+                    )}
+                </div>
             </div>
         </div>
     );
