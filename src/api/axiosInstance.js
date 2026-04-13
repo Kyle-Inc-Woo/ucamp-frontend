@@ -1,10 +1,14 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+console.log("BASE URL:", import.meta.env.VITE_API_BASE_URL);
+
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
-    }
+    },
 });
 
 axiosInstance.interceptors.request.use(
@@ -40,8 +44,12 @@ axiosInstance.interceptors.response.use(
                 }
 
                 const response = await axios.post(
-                    "http://localhost:8080/auth/refresh", {
-                        refreshToken
+                    `${API_BASE_URL}/auth/refresh`,
+                    { refreshToken },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                     }
                 );
 
@@ -59,6 +67,8 @@ axiosInstance.interceptors.response.use(
             } catch (refreshError) {
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
+                localStorage.removeItem("nickname");
+                localStorage.removeItem("userId");
                 window.location.href = "/login";
                 return Promise.reject(refreshError);
             }
