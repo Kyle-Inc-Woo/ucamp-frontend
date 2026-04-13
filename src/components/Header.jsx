@@ -1,12 +1,15 @@
 function Header({ isLoggedIn, onLogout, onLogin }) {
-    const nickname = localStorage.getItem("nickname") || "사용자";
+    const nickname = localStorage.getItem("nickname");
+    const displayName = nickname && nickname !== "undefined" ? nickname : "게스트";
 
     return (
         <div className="mx-auto mb-8 flex max-w-5xl items-center justify-between">
             <div>
-                <p className="m-0 text-sm text-gray-500">안녕하세요,</p>
+                <p className="m-0 text-sm text-gray-500">
+                    {isLoggedIn ? "안녕하세요," : "환영합니다,"}
+                </p>
                 <h2 className="mt-1 text-3xl font-bold text-gray-900">
-                    {nickname}님 👋
+                    {displayName}님 👋
                 </h2>
             </div>
 

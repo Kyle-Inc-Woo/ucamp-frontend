@@ -47,10 +47,10 @@ function PostListPage({ onLogout }) {
 
                     {isLoggedIn && (
                         <button
-                            onClick={() => navigate("/posts/create")}
+                            onClick={() => navigate("/boards")}
                             className="rounded-xl bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
                         >
-                            글쓰기
+                            게시판으로
                         </button>
                     )}
                 </div>
@@ -73,11 +73,21 @@ function PostListPage({ onLogout }) {
                                 onClick={() => navigate(`/posts/${post.id}`)}
                                 className="cursor-pointer rounded-3xl bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                             >
-                                <h3 className="mb-2 text-xl font-semibold text-gray-900">
-                                    {post.title}
-                                </h3>
-                                <p className="line-clamp-3 text-sm leading-6 text-gray-600">
+                                <div className="mb-2 flex items-center justify-between gap-3">
+                                    <h3 className="text-xl font-semibold text-gray-900">
+                                        {post.title}
+                                    </h3>
+                                    <span className="text-xs text-gray-400">
+                                        {post.boardName}
+                                    </span>
+                                </div>
+
+                                <p className="mb-3 line-clamp-3 text-sm leading-6 text-gray-600">
                                     {post.content}
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                    작성자: {post.nickname}
                                 </p>
                             </div>
                         ))}
